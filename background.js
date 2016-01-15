@@ -11,7 +11,7 @@ chrome.alarms.onAlarm.addListener(function(alarm){
 	recheck(myURL);
 });
 
-
+//Helper function to load secret file.
 function loadJSON(path, success, error){
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function(){
@@ -29,11 +29,13 @@ function loadJSON(path, success, error){
     xhr.send();
 }
 
+//Actually loads secret file
 loadJSON('secrets.json',
          function(data) { myKey = data['key']; },
          function(xhr) { console.error(xhr); }
 );
 
+//Watch for changes set in Options
 chrome.storage.onChanged.addListener(function(changes, namespace) {
 	for (key in changes) {
 		var storageChange = changes[key];
@@ -62,6 +64,7 @@ function setColor(input){
 	chrome.browserAction.setBadgeBackgroundColor({ color: theColorWeChooseToKillKuzco });
 }
 
+//
 function getSteamID(){
 	var urlOriginal;
 	var url;
@@ -95,7 +98,7 @@ function getSteamID(){
 	});
 };
 
-checkPeriod = 1; //In minutes.
+checkPeriod = 30; //In minutes.
 function recheck(url){
 	var xhr2 = new XMLHttpRequest();
 	xhr2.open('GET', myURL, true);

@@ -27,10 +27,10 @@ function commentOnHours(tagID, hours){
 			cmt = "Can I have a link to your twitch stream?";
 			break;
 		case (hours >=60 && hours < 80):
-			cmt = "You better be a game developer with this much hours";
+			cmt = "You better be a game developer with this much hours.";
 			break;
 		case (hours >= 80):
-			cmt = "Have you tried going outside? I heard the weather is nice this time of the year";
+			cmt = "Have you tried going outside? I heard the weather is nice this time of the year.";
 			break;
 		default:
 			cmt = "aaa";
