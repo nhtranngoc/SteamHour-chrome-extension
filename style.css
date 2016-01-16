@@ -1,4 +1,22 @@
+html {
+	height: 100%;
+}
+
 body {
-    min-width:300px;
-    background-color: #FFFFFF;
+    min-width:600px;
+    background-color: #263248;
+}
+
+p {
+	color: #FFFFFF;
+}
+
+#alert {
+	color: red;
+	background-color: white;
+	min-height: 100%;
+}
+
+footer {
+	vertical-align: center;
 }

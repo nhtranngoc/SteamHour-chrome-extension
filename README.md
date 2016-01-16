@@ -17,11 +17,21 @@ Enjoy!
 ===
 
 Todos: 
-	* Refactor code using jQuery
-	* Actually have a stylesheet
-	* Handle CSS with Bootstrap (?)
-	* Change checking period in Options
-	* Track time by day and week (instead of two weeks, straight from SteamAPI)
-	* List games by most played and hours (should be easy)
-	* Write more todos
+	[x] Allow more types of input
+
+	[x] Fix the alert bug in popup
+
+	[ ] Refactor code using jQuery
+
+	[ ] Actually have a stylesheet
+
+	[ ] Handle CSS with Bootstrap (?)
+
+	[ ] Change checking period in Options
+
+	[ ] Track time by day and week (instead of two weeks, straight from SteamAPI)
+
+	[ ] List games by most played and hours (should be easy)
+	
+	[ ] Write more todos
 

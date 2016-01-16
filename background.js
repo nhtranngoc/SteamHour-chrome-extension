@@ -6,6 +6,10 @@ var myKey = '';
 var myURL = '';
 var steamID='';
 
+
+var urlPatt = new RegExp('((http)s?:\/\/)|(steamcommunity\.com\/id\/)', 'gi');
+var idPatt = new RegExp('7656119[0-9]{10}', 'g');
+
 //Re-check Steam every x minutes.
 chrome.alarms.onAlarm.addListener(function(alarm){
 	recheck(myURL);
@@ -13,27 +17,27 @@ chrome.alarms.onAlarm.addListener(function(alarm){
 
 //Helper function to load secret file.
 function loadJSON(path, success, error){
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function(){
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                if (success)
-                    success(JSON.parse(xhr.responseText));
-            } else {
-                if (error)
-                    error(xhr);
-            }
-        }
-    };
-    xhr.open("GET", path, true);
-    xhr.send();
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if (xhr.readyState === XMLHttpRequest.DONE) {
+			if (xhr.status === 200) {
+				if (success)
+					success(JSON.parse(xhr.responseText));
+			} else {
+				if (error)
+					error(xhr);
+			}
+		}
+	};
+	xhr.open("GET", path, true);
+	xhr.send();
 }
 
 //Actually loads secret file
 loadJSON('secrets.json',
-         function(data) { myKey = data['key']; },
-         function(xhr) { console.error(xhr); }
-);
+	function(data) { myKey = data['key']; },
+	function(xhr) { console.error(xhr); }
+	);
 
 //Watch for changes set in Options
 chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -64,6 +68,31 @@ function setColor(input){
 	chrome.browserAction.setBadgeBackgroundColor({ color: theColorWeChooseToKillKuzco });
 }
 
+function validateInput(input){
+	templateURL = 'http://steamcommunity.com/id/';
+	suffixURL = '/\?xml\=1';
+	outputURL = '';
+
+	//Here we perform regex to find if input are one of the following: profileURL, profileID, or steamID, or none of the above
+	// Then we put together an url to make calls to steamcommunity.
+	//Filter out the url to get the profileID
+
+	if (input.match(urlPatt)) {
+		input = input.replace(urlPatt, "");
+		console.log('matched url');
+	} else {
+		console.log('matched profileID');
+	}
+	outputURL = templateURL + input + suffixURL;
+
+	if (input.match(idPatt)) {
+		console.log('matched steamID');
+		outputURL = input;
+	}
+
+	return outputURL;
+}
+
 //
 function getSteamID(){
 	var urlOriginal;
@@ -71,30 +100,33 @@ function getSteamID(){
 	var xhr;
 	chrome.storage.sync.get('steamID', function(items) {
 		urlOriginal = items['steamID'];
-		url = urlOriginal + '/\?xml\=1';
-		console.log('Connecting to ' + url);
-		
-		//Create new XML Request
-		xhr = new XMLHttpRequest();
-		xhr.open('GET', url, true);
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) {
-				if (xhr.status == 200) {
-					console.log(xhr.response);
-					var oParser = new DOMParser();
-					var oDOM = oParser.parseFromString(xhr.response, "text/xml");
-					steamID = oDOM.getElementsByTagName('steamID64')[0].textContent;
-					myID = steamID;
-					console.log('Your steamID64 is ' + myID);
-					myURL = 'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=' + myKey + '&steamid=' + myID + '&format=json';
+		url = validateInput(urlOriginal);
+
+		if (url.match(idPatt) == null){
+			console.log('Connecting to ' + url);
+			xhr = new XMLHttpRequest();
+			xhr.open('GET', url, true);
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200) {
+						console.log(xhr.response);
+						var oParser = new DOMParser();
+						var oDOM = oParser.parseFromString(xhr.response, "text/xml");
+						steamID = oDOM.getElementsByTagName('steamID64')[0].textContent;
+						myID = steamID;
 					//-----------------------------------
-					recheck(myURL);
-				} else {
-					console.log("Step 1 fail");
+					} else {
+						console.log("Step 1 fail");
+					}
 				}
 			}
-		}
 		xhr.send();
+	} else myID = url;
+	
+	console.log('Your steamID64 is ' + myID);
+	myURL = 'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=' + myKey + '&steamid=' + myID + '&format=json';
+	recheck(myURL);
+
 	});
 };
 
