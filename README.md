@@ -17,6 +17,7 @@ Enjoy!
 ===
 
 Todos: 
+
 	[x] Allow more types of input
 
 	[x] Fix the alert bug in popup
